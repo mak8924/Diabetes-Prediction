@@ -1,0 +1,232 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام التنبؤ المبكر بمرض السكري للنساء | GlycoPredict AI</title>
+    
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/all.min.css' %}">
+    
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-slate: #f8fafc;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --card-border: #e2e8f0;
+        }
+        
+        body {
+            background-color: var(--bg-slate);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-main);
+        }
+
+        .main-navbar {
+            background-color: #ffffff;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .brand-title {
+            font-weight: 700;
+            color: var(--primary-color);
+            letter-spacing: -0.5px;
+        }
+
+        .app-card {
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            background: #ffffff;
+            box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04);
+        }
+
+        .section-header {
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #334155;
+            font-size: 0.88rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .form-label i {
+            color: var(--primary-color);
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            padding: 12px 14px;
+            border: 1px solid #cbd5e1;
+            font-size: 0.92rem;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(37, 99, 219, 0.1);
+        }
+
+        .form-control::placeholder {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .btn-predict {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 14px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-predict:hover {
+            background-color: var(--primary-hover);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .result-box {
+            border-radius: 12px;
+            padding: 20px;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar main-navbar py-3">
+        <div class="container justify-content-center justify-content-md-between">
+            <a class="navbar-brand d-flex align-items-center gap-2 m-0" href="#">
+                <i class="fa-solid fa-heart-pulse text-danger fs-3"></i>
+                <span class="brand-title fs-4">GlycoPredict <span class="text-dark fw-normal">AI</span></span>
+            </a>
+            <span class="text-muted small d-none d-md-inline-block fw-semibold">
+                <i class="fa-solid fa-venus text-pink me-1" style="color: #db2777;"></i> نموذج مخصص للتشخيص النسائي (PIMA Dataset)
+            </span>
+        </div>
+    </nav>
+
+    <div class="container my-5" style="max-width: 900px;">
+        <div class="card app-card p-4 p-md-5">
+            
+            <div class="section-header text-center text-md-start">
+                <h3 class="fw-bold text-dark mb-2">بوابة الفحص والتحليل الرقمي المبكر (للنساء)</h3>
+                <p class="text-muted mb-0">الرجاء إدخال المؤشرات الحيوية والسريرية للمريضة بدقة لتشغيل نموذج التحليل الإحصائي الذكي.</p>
+            </div>
+            
+            <form method="POST">
+                {% csrf_token %}
+                <div class="row g-4">
+                    
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            <i class="fa-solid fa-person-pregnant"></i> عدد مرات الحمل (Pregnancies)
+                        </label>
+                        <input type="number" name="pregnancies" class="form-control" placeholder="أدخلي 0 إذا لم يسبق لها الحمل" required>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            <i class="fa-solid fa-droplet text-danger"></i> مستوى الجلوكوز في الدم (Glucose)
+                        </label>
+                        <input type="number" step="0.1" name="glucose" class="form-control" placeholder="معدل السكر صائم (ملغ/ديسيلتر)" required>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            <i class="fa-solid fa-heart-pulse text-dark"></i> ضغط الدم الانبساطي (Blood Pressure)
+                        </label>
+                        <input type="number" step="0.1" name="blood_pressure" class="form-control" placeholder="قياس الضغط (ملم زئبقي)" required>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            <i class="fa-solid fa-align-justify"></i> سمك طية جلد العضد (Skin Thickness)
+                        </label>
+                        <input type="number" step="0.1" name="skin_thickness" class="form-control" placeholder="القياس بالمليمتر (mm)" required>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            <i class="fa-solid fa-vial-medical"></i> مستوى الأنسولين في المصل (Insulin)
+                        </label>
+                        <input type="number" step="0.1" name="insulin" class="form-control" placeholder="النسبة بـ (ميكرو وحدة/مل)" required>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            <i class="fa-solid fa-weight-scale"></i> مؤشر كتلة الجسم (BMI)
+                        </label>
+                        <input type="number" step="0.1" name="bmi" class="form-control" placeholder="الوزن / مربع الطول" required>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            <i class="fa-solid fa-dna text-info"></i> مؤشر سلالة السكري الوراثي (Pedigree)
+                        </label>
+                        <input type="number" step="0.001" name="diabetes_pedigree" class="form-control" placeholder="مثال حسابي: 0.471" required>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            <i class="fa-solid fa-cake-candles text-warning"></i> عمر المريضة الحركي (Age)
+                        </label>
+                        <input type="number" name="age" class="form-control" placeholder="السن بالسنوات الكاملة" required>
+                    </div>
+                    
+                </div>
+
+                <button type="submit" class="btn btn-predict w-100 mt-5 shadow-sm">
+                    <i class="fa-solid fa-wand-magic-sparkles me-2"></i> معالجة المؤشرات وإصدار التنبؤ الطبي الفوري
+                </button>
+            </form>
+
+            {% if result %}
+                <div class="mt-5 pt-4 border-top">
+                    {% if "مصاب" in result or "إيجابي" in result or "1" in result or "High Risk" in result %}
+                        <div class="result-box bg-danger-subtle text-danger border border-danger-subtle d-flex flex-column flex-sm-row align-items-center gap-3">
+                            <i class="fa-solid fa-triangle-exclamation fs-2"></i>
+                            <div>
+                                <h5 class="fw-bold mb-1">مؤشر تنبؤ إيجابي (احتمالية إصابة مرتفعة)</h5>
+                                <p class="mb-0 small text-dark">تشير مخرجات الموديل الحالية إلى: <strong class="text-danger">{{ result }}</strong>. يرجى مراجعة الفحوصات الطبية للتأكيد.</p>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="result-box bg-success-subtle text-success border border-success-subtle d-flex flex-column flex-sm-row align-items-center gap-3">
+                            <i class="fa-solid fa-circle-check fs-2"></i>
+                            <div>
+                                <h5 class="fw-bold mb-1">مؤشر تنبؤ سلبي (احتمالية إصابة منخفضة)</h5>
+                                <p class="mb-0 small text-dark">تشير مخرجات الموديل الحالية إلى: <strong class="text-success">{{ result }}</strong>. المؤشرات تقع ضمن الحدود الآمنة للموديل.</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>
